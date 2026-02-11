@@ -150,7 +150,60 @@ list_price decimal (7,2),
 foreign key (order_id) references orders(order_id),
 discount int);
 
-
-
 alter table stocks add constraint fk_store
 foreign key (store_id) references stores(store_id)
+
+
+
+
+
+
+ -- procedure mis lisab INSERT andmeid tabelisse brands
+create procedure lisaBrand
+@brand_nimi varchar(30)
+as
+Begin
+	insert into brands(brand_name) values (@brand_nimi);
+	select * from brands;
+end;
+
+-- procedure kutse
+
+exec lisaBrand 'Cropp';
+
+-- procedure mis kustutab DELETE tabelist id järgi
+create procedure kustutaBrand
+@id int
+as 
+begin 
+select * from brands;
+delete from brands where brand_id=@id;
+select * from brands;
+end;
+-- kutse
+exec kustutaBrand 6;
+exec kustutaBrand @id=6;
+
+-- procedure mis otsib 1 tähte järgi brandinimed
+create procedure otsing1tahte
+@taht char(1)
+as
+begin
+select * from brands where brand_name like @taht+'%';
+end;
+--kutse
+exec otsing1tahte 'a';
+
+--procedure mis uuendab UPDATE brandinimi id järgi
+create procedure uuendaBrand
+@id int,
+@uus_brandNimi varchar(30)
+as 
+begin 
+select * from brands;
+update brands set brand_name =@uus_brandNimi 
+where brand_id=@id;
+select * from brands;
+end;
+--kutse
+exec uuendaBrand 1, 'Abibas';
