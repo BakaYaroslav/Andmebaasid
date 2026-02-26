@@ -1,0 +1,55 @@
+create database praktiline
+use praktiline
+
+create table Category(
+idCategory int primary key identity(1,1),
+CategotyName varchar(30) not null unique);
+
+insert into category(CategotyName)
+values ('category1'),
+('category2'),
+('category3'),
+('category4'),
+
+create table Product_(
+idProduct int primary key identity(1,1),
+ProductName varchar(30) not null,
+idCategory int unique,
+foreign key (idCategory) references category(idCategory),
+price decimal(7,2))
+--insert into  Product_(ProductName, idCategory, price)
+--values 
+
+create table sale(
+idSale  int primary key identity(1,1),
+idProduct int,
+foreign key (idProduct) references Product_(idProduct),
+idCustomer int not null unique,
+Count_ int,
+DateOfSale date);
+
+select * from sale;
+alter table sale alter column Count_ varchar(25);
+
+alter table sale add Units char(5);
+
+alter table sale drop column Units;
+
+create table customer(
+idCustomer  int primary key identity(1,1),
+name_ varchar(30),
+contact int not null unique,
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
