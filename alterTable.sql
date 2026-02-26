@@ -40,6 +40,8 @@ begin
 	concat('alter table ', @tabelinimi, ' add ', @veerunimi, ' ', @tyyp)
 	when @valik = 'drop' then 
 	concat('alter table ', @tabelinimi, ' drop column ', @veerunimi)
+	when @valik = 'alter' then 
+	concat('alter table ', @tabelinimi, ' alter column ', @veerunimi,  ' ', @tyyp)
 	END;
 	print @sql;
 	begin
@@ -48,8 +50,21 @@ begin
 end;
 --kutse
 --lisamine
-exec alterTable @valik='add',@tabeliNimi='kasutaja', @veeruNimi='mobiil', @tyyp='char(13)';
+exec alterTable @valik='add', 
+@tabeliNimi='kasutaja',
+@veeruNimi='elukoht',
+@tyyp='int';
 select * from kasutaja;
 --kutsutamine
-exec alterTable @valik='drop',@tabeliNimi='kasutaja', @veeruNimi='mobiil', @tyyp='char(13)';
+exec alterTable @valik='drop',
+@tabeliNimi='kasutaja',
+@veeruNimi='mobiil';
 select * from kasutaja;
+--veeru muutmine
+exec alterTable @valik='alter',
+@tabeliNimi='kasutaja',
+@veeruNimi='elukoht',
+@tyyp='varchar(30)';
+
+--proc kustutamine
+drop procedure alterTable
