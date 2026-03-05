@@ -1,0 +1,110 @@
+create database selectBaka
+use selectBaka;
+--mockaroo.com - andmete genereerimine
+
+create table auto  (
+	autoID INT primary key,
+	autoNumber CHAR(6) not null,
+	mark VARCHAR(50) not null,
+	mudel VARCHAR(50),
+	värv VARCHAR(50),
+	v_aasta INT,
+);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (1, 'UA9423', 'Pontiac', 'Safari', 'Teal', 1986);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (2, 'AV3743', 'Pontiac', 'Grand Prix', 'Yellow', 1999);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (3, 'DL2865', 'Ford', 'E150', 'Fuscia', 2010);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (4, 'AM9824', 'Mercury', 'Grand Marquis', 'Purple', 1999);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (5, 'TG8972', 'Mercury', 'Grand Marquis', 'Indigo', 2006);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (6, 'UA1148', 'BMW', 'X5', 'Khaki', 2007);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (7, 'ET9521', 'Dodge', 'Ram Van 1500', 'Teal', 2000);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (8, 'WN5998', 'Chevrolet', 'Colorado', 'Fuscia', 2005);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (9, 'KE8696', 'Ford', 'Fusion', 'Purple', 2008);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (10, 'NZ6947', 'GMC', 'Sierra 2500', 'Puce', 2007);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (11, 'AA8361', 'Scion', 'xD', 'Blue', 2011);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (12, 'AZ2894', 'Volvo', 'XC90', 'Yellow', 2004);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (13, 'IB4766', 'Oldsmobile', 'Alero', 'Purple', 2003);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (14, 'AC7048', 'Mercedes-Benz', 'SLR McLaren', 'Puce', 2005);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (15, 'SA8537', 'Volvo', 'C70', 'Yellow', 2004);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (16, 'SQ9273', 'Chrysler', '200', 'Orange', 2012);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (17, 'AF2263', 'Mercedes-Benz', 'W201', 'Puce', 1991);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (18, 'AM3700', 'Suzuki', 'Daewoo Lacetti', 'Maroon', 2005);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (19, 'IB1902', 'Toyota', 'Tacoma', 'Orange', 1996);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (20, 'AF8764', 'Volkswagen', 'Passat', 'Crimson', 1988);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (21, 'ET9224', 'Toyota', '4Runner', 'Purple', 2012);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (22, 'QR6930', 'Maserati', 'GranTurismo', 'Goldenrod', 2008);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (23, 'AC6622', 'Volvo', 'XC90', 'Mauv', 2010);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (24, 'SQ6136', 'GMC', '2500', 'Puce', 1993);
+insert into auto  (autoID, autoNumber, mark, mudel, värv, v_aasta) values (25, 'AZ7413', 'Land Rover', 'Range Rover Sport', 'Orange', 2008);
+
+select * from auto
+
+-- andmete sorteerimine
+
+-- kasvavas järjekorras
+select * from auto 
+order by v_aasta;
+
+-- kahanevas järjekorras
+select * from auto 
+order by v_aasta DESC;
+
+-- kuvab ainult 2 veergu
+select mark, mudel from auto
+
+-- kordavate väärtuste välistamine DISTINT
+select distinct mark from auto;
+--võrdlemine 
+--1. suurem kui >, väksem kui <, võrdub  =
+
+--leia kõik autos, kus v_aaste peale
+select mark, mudel, v_aasta from auto 
+where v_aasta >= 2000;
+
+--leia kõik autod vahemikus 2000-2005
+
+select mark, mudel, v_aasta from auto 
+where v_aasta between 2000 and 2005 ;
+--või 
+select mark, mudel, v_aasta from auto 
+where v_aasta >= 2000 and v_aasta <= 2005;
+
+--2. võdlemine text või sümbooliga 
+-- kuvab kõik ford'i autod
+select mark, mudel, v_aasta from auto 
+where mark LIKE  'Ford';
+
+--IN lause kuvab vastavus loetelus - соответствие перечислению
+
+select mark, mudel, v_aasta from auto 
+where mark IN  ('Ford', 'BMW', 'Nissan');
+
+--ilma IN
+select mark, mudel, v_aasta from auto 
+where mark LIKE 'Ford' OR mark LIKE  'BMW' OR mark LIKE 'Nissan';
+
+
+--vastavus mustrile - шаблон 
+--algab F tähega 
+select mark, mudel, v_aasta
+from auto 
+where mark LIKE 'F%';
+--lõpeb W -tähega
+select mark, mudel, v_aasta
+from auto 
+where mark LIKE '%W';
+--sissaldab a-täht
+select mark, mudel, v_aasta
+from auto 
+where mark LIKE '%a%';
+-- kuvada esimext 5 mudeli 
+select TOP 5 mudel, värv from auto
+where värv like 'blue'
+Order by värv;
+
+--agregat funktsioonid: SUM, MIN, MAX, AVG, COUNT
+select count(*) as autode_arv from auto
+select max(v_aasta) as max_aasta from auto
+--keerulisem variant 
+select mark, AVG(v_aasta)  as keskmineAasta
+from auto 
+group by mark;
