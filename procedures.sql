@@ -38,6 +38,108 @@ model_year int,
 list_price decimal(7,2));
 
 
+
+
+CREATE TABLE Products
+(
+    Id INT IDENTITY PRIMARY KEY,
+    ProductName NVARCHAR(30) NOT NULL,
+    Manufacturer NVARCHAR(20) NOT NULL,
+    ProductCount INT DEFAULT 0,
+    Price MONEY NOT NULL
+);
+
+insert into  Products(ProductName, Manufacturer, ProductCount, Price) 
+values ('Komid', 'KommiPrint', 1300, 1.30),
+('Arvutid', 'Tere Maailm', 2400, 1000),
+('Pallid', 'Pallee', 14, 10),
+('Telefoonid', 'Apple', 1000, 700),
+('Riided', 'Nike', 10000, 15);
+
+select * from Products
+
+-- proceduur mis kuvab Product Manufactured ja Price 
+CREATE PROCEDURE ProductSummary
+AS
+BEGIN
+SELECT ProductName AS Product, Manufacturer, Price
+FROM Products
+END;
+--KUTSE
+EXEC  ProductSummary
+--proceduur  mis lisab uus product 
+CREATE PROCEDURE AddProduct
+    @name NVARCHAR(20),
+    @manufacturer NVARCHAR(20),
+    @count INT,
+    @price MONEY
+AS
+INSERT INTO Products(ProductName, Manufacturer, ProductCount, Price) 
+VALUES(@name, @manufacturer, @count, @price)
+
+exec AddProduct 'Komid2', 'KommiPrint', 1300, 1.30
+select * from Products
+
+-- kutse 2
+DECLARE @prodName NVARCHAR(20), @company NVARCHAR(20);
+DECLARE @prodCount INT, @price MONEY
+SET @prodName = 'Galaxy C7'
+SET @company = 'Samsung'
+SET @price = 22000
+SET @prodCount = 5
+ 
+EXEC AddProduct @prodName, @company, @prodCount, @price
+ 
+SELECT * FROM Products
+
+-- kutse 3
+DECLARE @prodName NVARCHAR(20), @company NVARCHAR(20);
+SET @prodName = 'Honor 9'
+SET @company = 'Huawei'
+ 
+EXEC AddProduct @name = @prodName, 
+                @manufacturer=@company,
+                @count = 3, 
+                @price = 18000
+
+
+-- proceduur ilma kasutava parametriga count
+CREATE PROCEDURE AddProductWithOptionalCount
+    @name NVARCHAR(20),
+    @manufacturer NVARCHAR(20),
+    @price MONEY,
+    @count INT = 1
+AS
+INSERT INTO Products(ProductName, Manufacturer, ProductCount, Price) 
+VALUES(@name, @manufacturer, @count, @price)
+
+
+DECLARE @prodName NVARCHAR(20), @company NVARCHAR(20), @price MONEY
+SET @prodName = 'Redmi Note 5A'
+SET @company = 'Xiaomi'
+SET @price = 22000
+ 
+EXEC AddProductWithOptionalCount @prodName, @company, @price
+ 
+SELECT * FROM Products
+
+-- proceduur koos OUTPUT prarmetriga
+CREATE PROCEDURE GetPriceStats
+    @minPrice MONEY OUTPUT,
+    @maxPrice MONEY OUTPUT
+AS
+SELECT @minPrice = MIN(Price),  @maxPrice = MAX(Price)
+FROM Products
+
+DECLARE @minPrice MONEY, @maxPrice MONEY
+ 
+EXEC GetPriceStats @minPrice OUTPUT, @maxPrice OUTPUT
+ 
+PRINT 'minimaalne hind ' + CONVERT(VARCHAR, @minPrice)
+PRINT 'maksimaalne hind ' + CONVERT(VARCHAR, @maxPrice)
+SELECT * FROM Products
+
+
 alter table products add constraint fk_brand
 foreign key (brand_id) references brands(brand_id);
 insert into products
