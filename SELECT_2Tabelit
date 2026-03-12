@@ -1,0 +1,103 @@
+create database baka; 
+use baka;
+
+--laps/loom tabelid 
+CREATE TABLE laps(
+lapsID int not null PRIMARY KEY identity(1,1),
+nimi varchar(40) not null,
+pikkus smallint,
+synniaasta int null,
+synnilinn varchar(15)
+)
+
+insert into laps(nimi, pikkus, synniaasta, synnilinn)
+values ('Kirill', 156, 2005, 'Tallinn'), 
+('Nikita', 167, 2007, 'Tallinn'), 
+('Oleg', 186, 2006, 'Tallinn'), 
+('Leena', 176, 2008, 'Tallinn'),
+('kirill', 189, 2003, 'Tallinn');
+select * from laps
+
+
+CREATE TABLE loom(
+loomID int not null PRIMARY KEY identity(1,1),
+nimi varchar(40) not null,
+kaal smallint,
+lapsID int,
+FOREIGN KEY (lapsID) REFERENCES laps(lapsID));
+
+alter table loom add varjupaikID int;
+
+alter table loom add constraint fk_varjupaik
+foreign key(varjupaikID) references varjupaik(varjupaikID)
+
+insert into loom( nimi, kaal, lapsID)
+values ('koer Džek', 5, 1), 
+('kass Vasili', 14, 2), 
+('koer Stepan', 3, 3), 
+('papagoj Keša', 5, 3), 
+('kass Ivan', 5, 5);
+select * from loom
+
+
+CREATE TABLE varjupaik(
+varjupaikID int not null PRIMARY KEY identity(1,1),
+koht varchar(50) not null,
+firma varchar(30))
+
+insert into varjupaik(koht, firma)
+values ('Paljasaare', 'Varjupaikade MTÜ');
+select * from varjupaik;
+update loom set varjupaikID=1;
+select * from loom;
+
+
+-- Alias-nimede kasutamine
+select l.nimi, l.kaal from loom as l; 
+
+-- sisemine ühendamine 
+select * from laps, loom -- nii ei tohi kirjutada, sest 1 tabeli kirjad korrutakse teise tabeli kirjada
+
+-- õige päring
+select * from laps, loom 
+where loom.lapsID=laps.lapsID;
+-- sama pärinf alias-nimedega
+select * from laps as lp, loom as l
+where l.lapsID=lp.lapsID;
+
+--kitsendame päringu 
+select lp.nimi as lapseNimi, l.nimi as loomNimi, l.kaal, lp.synnilinn
+from laps as lp, loom as l
+where l.lapsID=lp.lapsID;
+
+-- INNER JOIN ühendamine
+select * from laps INNER JOIN loom 
+on loom.lapsID=laps.lapsID;
+
+select * from laps as lp INNER JOIN loom as l
+on l.lapsID=lp.lapsID;
+
+--LEFT JOIN  -- näitab kõik lapsed isegi kui puubub loom
+select lp.nimi as lapseNimi, l.nimi as loomNimi, l.kaal, lp.synnilinn
+from laps as lp left join loom as l
+on l.lapsID=lp.lapsID;
+
+--RIGHT JOIN
+select lp.nimi as lapseNimi, l.nimi as loomNimi, l.kaal, lp.synnilinn
+from laps as lp right join loom as l
+on l.lapsID=lp.lapsID;
+
+-- CROSS JOIN - korrutatud tabelid
+select lp.nimi as lapseNimi, l.nimi as loomNimi, l.kaal, lp.synnilinn
+from laps as lp cross join loom as l
+
+--select 3/mitme tabelite põhjal
+select lp.nimi as lapseNimi, l.nimi as loomNimi, v.koht
+from laps as lp, loom as l, varjupaik as v
+where l.lapsID=lp.lapsID  and l.varjupaikID=v.varjupaikID;
+
+-- sama inner joiniga
+select lp.nimi as lapseNimi, l.nimi as loomNimi, v.koht
+from (laps as lp INNER JOIN loom as l
+ON l.lapsID=lp.lapsID) INNER JOIN varjupaik as v
+ON l.varjupaikID=v.varjupaikID;
