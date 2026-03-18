@@ -110,3 +110,26 @@ drop view AutoriUudisedAjalehes;
 
 update AutoriUudisedAjalehes set kuupaev = '2026-03-18';
 select * from uudised; 
+
+
+-- tee view mis näitab uudised konkretsel kuupäeval
+-- tee view mis näitab ajakirjuniku konkretsel telefon
+-- tee view mis näitab ajalehte konkretsel ajalehtNimetus
+create view uudisedKuupaeval as
+select * from uudised
+where  kuupaev = '2026-03-18'
+
+select * from uudisedKuupaeval
+
+create view ajakirjanikuTelefon as
+SELECT nimi, telefon from ajakirjanik
+Where nimi Like 'A%'
+
+select * from ajakirjanikuTelefon
+
+create view ajalehtNimetus as
+select ajalehtNimetus from ajaleht
+where len(ajalehtNimetus)=5
+
+select * from ajalehtNimetus 
+
