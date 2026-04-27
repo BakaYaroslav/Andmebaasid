@@ -202,3 +202,109 @@ update Autoo
 SET AutoNR = '321ABC' WHERE AutoID = 3
 select * from Autoo
 select * from logiAuto
+
+
+
+----------KAHE-TABELIST-TRIGERID--------------
+
+--tabel linnad
+create table linnad(
+LinnId int primary key identity(1,1),
+linnaNimi varchar(50) unique,
+rahvaarv int not null);
+
+drop table linnad
+
+--tabel logi
+create table logi(
+Id int primary key identity(1,1),
+kuupaev datetime,
+andmed text,
+kasutaja varchar(25));
+
+--maakond
+create table maakonnad (
+maakondID int primary key identity(1,1),
+maakondNimi varchar(30)
+);
+
+-- foreign key tabelis linnad 
+alter table linnad add maakondID int;
+select * from linnad; 
+
+alter table linnad add constraint fr_maakond
+foreign key (maakondID) references maakonnad(maakondID);
+
+--täidame tabelid 
+--maakonnad
+insert into maakonnad 
+values ('Hajrumaa'), ('Pärnumaa'), ('Raplamaa')
+
+select * from maakonnad
+insert into linnad (linnanimi, rahvaArv, maakondID)
+values ('Tallinn', 600000, 1), ('Rapla', 5000, 3), ('Pärnu', 40000, 2);
+
+select * from linnad, maakonnad where
+linnad.maakondID=maakonnad.maakondID;
+--sama päring inner join'iga
+select * from linnad inner join maakonnad
+on linnad.maakondID=maakonnad.maakondID;
+
+
+--triger, mis jälgib kask seostatud tabelit
+create trigger linnalisamine 
+on linnad
+for insert
+as
+insert into logi (kuupaev, andmed, kasutaja)
+select
+getdate(),
+CONCAT('inserted: ', inserted.linnanimi, ', ', inserted.rahvaarv, ', ', m.maakondID), 
+SYSTEM_USER
+from inserted inner join maakonnad m
+on inserted.maakondID=m.maakondID;
+
+--kontroll
+insert into linnad (linnanimi, rahvaArv, maakondID)
+values ('Jüri', 1500, 1);
+
+select * from logi
+
+
+-- delete trigger
+create trigger linnaKutsutamine
+on linnad 
+for delete
+as 
+insert into logi (kuupaev, andmed, kasutaja)
+select
+getdate(),
+CONCAT('deleted: ', deleted.linnanimi, ', ', deleted.rahvaarv, ', ', m.maakondID), 
+SYSTEM_USER
+from deleted inner join maakonnad m
+on deleted.maakondID=m.maakondID;
+
+delete from linnad where maakondID = 1;
+
+select * from logi
+
+-- update trigger
+create trigger linnaUueandamine
+on linnad 
+for update
+as 
+insert into logi(kuupaev, andmed, kasutaja)
+select 
+getdate(), 
+concat('vana linna andmed: ', deleted.linnanimi, ', ', deleted.rahvaarv, ', ', m1.maakondID,
+'| uue linna andmed: ', inserted.linnanimi, ', ', inserted.rahvaarv, ', ', m2.maakondID),
+SYSTEM_USER
+from deleted
+inner join inserted on deleted.LinnID=inserted.LinnID
+inner join maakonnad m1 on deleted.maakondID=m1.maakondID
+inner join maakonnad m2 on deleted.maakondID=m2.maakondID;
+
+update linnad set linnanimi = 'uus Rapla', rahvaarv = 6000
+where linnID = 2;
+select * from linnad;
+select * from logi;
