@@ -308,3 +308,35 @@ update linnad set linnanimi = 'uus Rapla', rahvaarv = 6000
 where linnID = 2;
 select * from linnad;
 select * from logi;
+
+------XAMPP------
+--INSERT TRIGGER
+insert into logi (kuupaev, andmed, kasutaja)
+select
+now(),
+CONCAT('inserted: ', new.linnanimi, ', ', new.rahvaarv, ', ', m.maakondID), 
+USER()	
+from linnad inner join maakonnad m
+on linnad.maakondID=m.maakondID;
+where linnad.LinnId=new.linnID
+
+--DELETE TRIGGER
+insert into logi (kuupaev, andmed, kasutaja)
+select
+now(),
+CONCAT('deleted: ', old.linnanimi, ', ', old.rahvaarv, ', ', m.maakondID), 
+USER()
+from linnad inner join maakonnad m
+on linnad.maakondID=m.maakondID
+
+--UPDATE TRIGGER
+insert into logi(kuupaev, andmed, kasutaja)
+select 
+now(), 
+concat('vana linna andmed: ', old.linnanimi, ', ', old.rahvaarv, ', ', m1.maakondID,
+'\nuue linna andmed: ', new.linnanimi, ', ', new.rahvaarv, ', ', m2.maakondID),
+USER()
+from linnad
+inner join maakonnad m1 on old.maakondID=m1.maakondID
+inner join maakonnad m2 on new.maakondID=m2.maakondID
+WHERE new.linnId=linnad.LinnId
