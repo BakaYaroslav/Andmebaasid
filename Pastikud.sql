@@ -340,3 +340,103 @@ from linnad
 inner join maakonnad m1 on old.maakondID=m1.maakondID
 inner join maakonnad m2 on new.maakondID=m2.maakondID
 WHERE new.linnId=linnad.LinnId
+
+
+----FOORUM ÜLESANNE-----KAHE-TABELI-PÕHJAL--------
+
+create database HR2;
+USE HR2;
+
+-- lisamine tabel tootajad
+create table tootajad(
+tootajadID int primary key identity(1,1),
+Nimi varchar(30),
+synnipaev date,
+aadress varchar(50),
+HR_ID int
+);
+
+-- table HR
+CREATE TABLE HR (
+HRid int unique identity(1,1),
+Nimi varchar(50),
+PereNimi varchar(50),
+PRIMARY KEY (Nimi, PereNimi));
+
+drop table tootajad
+drop table HR
+
+-- foreign key
+ALTER TABLE tootajad 
+ADD CONSTRAINT fk_tootajad_HR
+FOREIGN KEY (HR_ID) REFERENCES HR(HRid);
+
+-- lisamine tabel logi
+create table logi(
+logiID int primary key identity(1,1),
+kuupaev datetime,
+andmed varchar(3000),
+kasutaja varchar(30)
+);
+drop table logi
+
+
+-- triger tootajalisamine 
+create trigger tootajalisamine 
+on tootajad
+for insert
+as
+insert into logi(kuupaev, andmed, kasutaja)
+select
+getdate(),
+CONCAT('inserted: ', inserted.nimi, ', ', inserted.synnipaev, ', ', inserted.aadress, 'HR: ', HR.Nimi, HR.PereNimi), 
+SYSTEM_USER
+FROM inserted
+LEFT JOIN HR ON inserted.HR_ID = HR.HRid;
+
+drop trigger tootajalisamine
+
+-- triger tootajaKustutamine
+create trigger tootajaKustutamine
+on tootajad
+for delete
+as
+insert into logi(kuupaev, andmed, kasutaja)
+select
+getdate(),
+CONCAT('deleted: ', deleted.nimi, ', ', deleted.synnipaev, ', ', deleted.aadress, 'HR: ', HR.Nimi, HR.PereNimi), 
+SYSTEM_USER
+FROM deleted INNER JOIN HR ON deleted.HR_ID = HR.HRid;
+
+drop trigger tootajaKustutamine
+delete from tootajad where tootajadID = 12;
+select * from tootajad
+select * from logi
+
+create trigger tootajaUueandamine
+ON tootajad
+FOR UPDATE
+AS 
+BEGIN
+INSERT INTO logi(kuupaev, andmed, kasutaja)
+SELECT 
+    GETDATE(), 
+    CONCAT(
+        'Vana: ', d.nimi, ', ', d.synnipaev, ', ', d.aadress, ' HR: ', h1.Nimi, ' ', h1.PereNimi,
+        ' | Uus: ', i.nimi, ', ', i.synnipaev, ', ', i.aadress, ' HR: ', h2.Nimi, ' ', h2.PereNimi
+    ),
+    SYSTEM_USER
+FROM deleted d
+INNER JOIN inserted i ON d.tootajadID = i.tootajadID 
+INNER JOIN HR h1 ON d.HR_ID = h1.HRid
+INNER JOIN HR h2 ON i.HR_ID = h2.HRid;
+END;
+drop trigger tootajaUueandamine
+
+update tootajad set nimi = 'Yarik'
+where tootajadID = 2;
+select * from tootajad; 
+select * from logi; 
+
+GRANT SELECT, INSERT, DELETE, UPDATE ON tootajad TO HRHaldaja;
+GRANT SELECT, INSERT, DELETE, UPDATE ON HR TO HRHaldaja; 
