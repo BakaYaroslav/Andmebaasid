@@ -32,9 +32,9 @@ INSERT INTO Mang (MangNimi) VALUES
 ('Racing'),
 ('Fighting');
 
-GRANT SELECT, INSERT, DELETE ON KyberSport TO osalejaNimi;
-GRANT SELECT, INSERT, DELETE ON KyberOsaleja TO osalejaNimi; 
-GRANT SELECT ON Mang TO osalejaNimi;
+GRANT SELECT, INSERT, DELETE ON KyberSport TO Yaroslav;
+GRANT SELECT, INSERT, DELETE ON KyberOsaleja TO Yaroslav; 
+GRANT SELECT ON Mang TO Yaroslav;
 
 CREATE TABLE logi(
 	id INT PRIMARY KEY IDENTITY(1,1),
@@ -53,8 +53,9 @@ insert into logi(kasutaja, kuupaev, sisestatudAndmed)
 SELECT
     SYSTEM_USER, 
     GETDATE(),
-    CONCAT('deleted: KyberSportID:', d.KyberSportID, ', ManguNimi: ', d.KyberManguNimi, ', OsalejateArv: ', d.OsalejateArv, ', MangID: ', d.MangID)
-FROM deleted d;
+    CONCAT('deleted: KyberSportID:', d.KyberSportID, ', ManguNimi: ', d.KyberManguNimi, ', OsalejateArv: ', d.OsalejateArv, ', MangID: ', m.MangNimi)
+FROM deleted d
+INNER JOIN Mang m ON d.MangID = m.MangID;
 
 drop trigger kustutaKyberSport;
 
@@ -66,8 +67,12 @@ insert into logi(kasutaja, kuupaev, sisestatudAndmed)
 SELECT
     SYSTEM_USER, 
     GETDATE(),
-    CONCAT('inserted: KyberSportID:', i.KyberSportID, ', ManguNimi: ', i.KyberManguNimi, ', OsalejateArv: ', i.OsalejateArv, ', MangID: ', i.MangID)
-FROM inserted i;
+    CONCAT('inserted: KyberSportID:', i.KyberSportID, ', ManguNimi: ', i.KyberManguNimi, ', OsalejateArv: ', i.OsalejateArv, ', MangID: ', m.MangNimi)
+FROM inserted i
+INNER JOIN Mang m ON i.MangID = m.MangID;
+
+select * from KyberSport;
+select * from Mang
 
 drop trigger lisaKyberSport;
 
@@ -91,19 +96,21 @@ CREATE PROCEDURE lisaKyberMang_KyberOsalejaga
     @Vanus INT
 AS
 BEGIN
-    INSERT INTO KyberSport (KyberManguNimi, OsalejateArv, MangID) VALUES (@KyberManguNimi, @OsalejateArv, @MangID);
-
-    DECLARE @UusKyberSportID INT = SCOPE_IDENTITY(); -- salvestab KyberSportID 
-
-    INSERT INTO KyberOsaleja (OsalejaNimi, Vanus, KyberSportID) VALUES (@OsalejaNimi, @Vanus, @UusKyberSportID);
+   
+    INSERT INTO KyberSport (KyberManguNimi, OsalejateArv, MangID) 
+    VALUES (@KyberManguNimi, @OsalejateArv, @MangID);
+  
+    INSERT INTO KyberOsaleja (OsalejaNimi, Vanus, KyberSportID) 
+    VALUES (@OsalejaNimi, @Vanus, SCOPE_IDENTITY());
 
     SELECT * FROM KyberSport;
 END;
-GO
 
 drop procedure lisaKyberMang_KyberOsalejaga
+
+
 -- protseduur kutse
-EXEC lisaKyberMang_KyberOsalejaga @KyberManguNimi = 'CS 2',  @OsalejateArv = 10, @MangID = 1, @OsalejaNimi = 'S1mple', @Vanus = 30;
+EXEC lisaKyberMang_KyberOsalejaga @KyberManguNimi = 'CS 3',  @OsalejateArv = 10, @MangID = 1, @OsalejaNimi = 'S1mple2', @Vanus = 33;
  
  select * from KyberSport
 
@@ -180,24 +187,27 @@ BEGIN
     SELECT
         SYSTEM_USER, 
         GETDATE(),
-        CONCAT(
+       CONCAT( 
             'UPDATED: ',
-            'VANAD ANDMED: KyberSportID: ', d.KyberSportID, ', ManguNimi: ', d.KyberManguNimi, ', OsalejateArv: ', d.OsalejateArv, ', MangID: ', d.MangID, ' | ',
-            'UUED ANDMED: KyberSportID: ', i.KyberSportID, ', ManguNimi: ', i.KyberManguNimi, ', OsalejateArv: ', i.OsalejateArv, ', MangID: ', i.MangID
+            'VANAD ANDMED: KyberSportID: ', d.KyberSportID, ', ManguNimi: ', d.KyberManguNimi, ', OsalejateArv: ', d.OsalejateArv, ', MangID: ', m1.MangNimi, ' | ',
+            'UUED ANDMED: KyberSportID: ', i.KyberSportID, ', ManguNimi: ', i.KyberManguNimi, ', OsalejateArv: ', i.OsalejateArv, ', MangID: ', m2.MangNimi
         )
     FROM deleted d
-    INNER JOIN inserted i ON d.KyberSportID = i.KyberSportID;
-END;
+    INNER JOIN inserted i ON d.KyberSportID = i.KyberSportID
+    INNER JOIN Mang m1 ON d.MangID = m1.MangID
+    INNER JOIN Mang m2 ON i.MangID = m2.MangID;
 
-
+end;
 
 Update KyberSport set OsalejateArv = 5
 where KyberSportID = 6 ;
 
+drop trigger uuendaKyberSport
+
+select * from logi
 
 
-
---------- OsalejaNimi---------- kasutaja
+--------- Yaroslav ---------- kasutaja
 
 
 select * from Mang
